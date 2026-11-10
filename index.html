@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark-slate">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KetikFast Ultimate 2.0 - Lab Mengetik 10 Jari Biometrik & RPG Offline</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Modular Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 lg:p-8" data-theme="dark-slate">
+
+  <!-- ==========================================================================
+       HEADER & TOP CONTROL BAR
+       ========================================================================== -->
+  <header class="max-w-5xl w-full mx-auto flex flex-wrap items-center justify-between gap-3 mb-6">
+    
+    <!-- Logo & Title -->
+    <div class="flex items-center gap-2.5 shrink-0">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shadow-lg theme-btn-primary shrink-0">
+        ⚡
+      </div>
+      <div>
+        <div class="flex items-center gap-1.5">
+          <h1 class="font-extrabold text-lg sm:text-xl tracking-tight leading-none">KetikFast</h1>
+          <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider theme-control-btn leading-none">2.0</span>
+        </div>
+        <p class="text-[11px] theme-text-muted mt-1 leading-none">10-Finger Biometric &amp; RPG</p>
+      </div>
+    </div>
+
+    <!-- Right Quick Controls (100% Uniform Height & Flush Alignment) -->
+    <div class="flex flex-wrap items-center gap-1.5">
+      
+      <!-- Personal Best Badge -->
+      <div class="toolbar-pill theme-control-btn" title="Rekor Kecepatan Terbaik (Personal Best)">
+        <span>🏆 PB:</span>
+        <span id="pb-wpm" class="font-bold text-amber-400">0 WPM</span>
+      </div>
+
+      <!-- Sound FX Selector & Volume -->
+      <div class="toolbar-pill theme-control-btn">
+        <span>🎧</span>
+        <select id="sound-profile" onchange="changeSoundProfile(this.value)" aria-label="Profil Suara">
+          <option value="thocky">Thocky</option>
+          <option value="clicky">Clicky</option>
+          <option value="creamy">Creamy</option>
+          <option value="piano">🎹 Piano</option>
+          <option value="chiptune">👾 Synth</option>
+          <option value="mute">🔇 Mute</option>
+        </select>
+        <input type="range" id="sound-volume" min="0" max="1" step="0.1" value="0.7" onchange="changeSoundVolume(this.value)" class="w-11 h-1.5 accent-blue-500 cursor-pointer" title="Volume Suara">
+      </div>
+
+      <!-- Rhythm Metronome Toggle -->
+      <button id="metronome-btn" onclick="cycleMetronome()" class="toolbar-pill theme-control-btn" title="Metronom Ritme Ketikan (Off / 40 / 60 / 80 WPM)">
+        <span>⏱️</span>
+        <span id="metronome-label">Ritme: Off</span>
+      </button>
+
+      <!-- Theme Selector -->
+      <div class="toolbar-pill theme-control-btn">
+        <span>🎨</span>
+        <select id="theme-selector" onchange="switchTheme(this.value)" aria-label="Pilih Tema">
+          <option value="dark-slate">Dark Slate</option>
+          <option value="retro-paper">Retro Paper</option>
+          <option value="dracula">Dracula</option>
+          <option value="matrix">Matrix</option>
+          <option value="mocha">Mocha</option>
+          <option value="cyberpunk">Cyberpunk</option>
+        </select>
+      </div>
+
+      <!-- Visual Guide Display Switcher (3D/2D/Off) -->
+      <button onclick="cycleVisualGuideMode()" class="toolbar-pill theme-control-btn" title="Ganti Tampilan Keyboard Virtual (3D / 2D / Sembunyi)">
+        <span id="guide-mode-icon">⌨️</span>
+        <span id="guide-mode-text" class="hidden sm:inline">Keyboard 3D</span>
+      </button>
+
+      <!-- Zen Mode Toggle -->
+      <button onclick="toggleZenMode()" class="toolbar-pill theme-control-btn" title="Mode Zen Minimalis (Ctrl+Shift+Z)">
+        <span>🧘</span>
+      </button>
+
+      <!-- History & Biomechanical Analytics Modal Toggle -->
+      <button onclick="openHistoryModal()" class="toolbar-pill theme-control-btn" title="Lihat Analitik Biometrik & Histori Skor">
+        <span>📊</span>
+        <span class="hidden sm:inline">Histori</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="max-w-5xl w-full mx-auto flex-1 flex flex-col justify-center my-auto relative">
+    
+    <!-- ----------------------------------------------------------------------
+         SETUP PANEL (DASHBOARD MENU UTAMA)
+         ---------------------------------------------------------------------- -->
+    <div id="setup-panel" class="theme-card border p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6 transition-all">
+      
+      <!-- 1. MODE PERMAINAN (5 PILIHAN TERMASUK AKADEMI 10 JARI & BOSS BATTLE) -->
+      <div>
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+          <label class="text-xs font-bold uppercase tracking-wider theme-text-muted">1. Pilih Mode Permainan &amp; Kurikulum</label>
+          <span class="text-[11px] theme-text-muted">Tips: Tekan <kbd class="px-1.5 py-0.5 rounded border text-[10px] font-mono-custom">Tab</kbd> saat bermain untuk restart cepat</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <button onclick="selectMode('time')" class="option-card mode-btn p-3.5 rounded-2xl border text-left flex items-start gap-2.5 transition-all active" data-mode="time">
+            <span class="text-xl">⏳</span>
+            <div>
+              <div class="font-bold text-sm">Mode Waktu</div>
+              <div class="text-[11px] theme-text-muted">15d - 120d</div>
+            </div>
+          </button>
+          <button onclick="selectMode('words')" class="option-card mode-btn p-3.5 rounded-2xl border text-left flex items-start gap-2.5 transition-all" data-mode="words">
+            <span class="text-xl">🔤</span>
+            <div>
+              <div class="font-bold text-sm">Jumlah Kata</div>
+              <div class="text-[11px] theme-text-muted">10 - 100 kata</div>
+            </div>
+          </button>
+          <button onclick="selectMode('quote')" class="option-card mode-btn p-3.5 rounded-2xl border text-left flex items-start gap-2.5 transition-all" data-mode="quote">
+            <span class="text-xl">💬</span>
+            <div>
+              <div class="font-bold text-sm">Kutipan Utuh</div>
+              <div class="text-[11px] theme-text-muted">1 Kalimat penuh</div>
+            </div>
+          </button>
+          <button onclick="selectMode('academy')" class="option-card mode-btn p-3.5 rounded-2xl border text-left flex items-start gap-2.5 transition-all" data-mode="academy">
+            <span class="text-xl">🎓</span>
+            <div>
+              <div class="font-bold text-sm text-emerald-400">Akademi 10 Jari</div>
+              <div class="text-[11px] theme-text-muted">Kurikulum Lv 1-6</div>
+            </div>
+          </button>
+          <button onclick="selectMode('boss')" class="option-card mode-btn p-3.5 rounded-2xl border text-left flex items-start gap-2.5 transition-all" data-mode="boss">
+            <span class="text-xl">⚔️</span>
+            <div>
+              <div class="font-bold text-sm text-rose-400">RPG Boss Battle</div>
+              <div class="text-[11px] theme-text-muted">Lawan Boss Ketik</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 1B. SUB-OPTIONS (DURASI / JUMLAH KATA / LEVEL AKADEMI / PILIHAN BOSS) -->
+      <div id="sub-options-container" class="space-y-2">
+        <label class="block text-xs font-bold uppercase tracking-wider theme-text-muted" id="sub-option-label">Pilih Durasi Waktu (Detik)</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="sub-option-buttons"></div>
+      </div>
+
+      <!-- 2. KATEGORI TEKS MATERI -->
+      <div id="category-section">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+          <label class="text-xs font-bold uppercase tracking-wider theme-text-muted">2. Kategori Teks Materi</label>
+          
+          <!-- Ghost Pacemaker Toggle -->
+          <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer select-none px-3 py-1.5 rounded-xl border theme-control-btn">
+            <input type="checkbox" id="ghost-toggle" checked onchange="toggleGhostSetting(this.checked)" class="accent-amber-500 rounded cursor-pointer">
+            <span>👻 Aktifkan Bayangan Pacemaker (Ghost PB / Target)</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <button onclick="selectCategory('umum')" class="option-card category-btn p-4 rounded-2xl border text-left flex items-start gap-3 transition-all active" data-cat="umum">
+            <span class="text-2xl">📚</span>
+            <div>
+              <div class="font-bold text-sm">Umum &amp; Budaya</div>
+              <div class="text-xs theme-text-muted">Pengetahuan umum, kuliner &amp; nusantara.</div>
+            </div>
+          </button>
+          <button onclick="selectCategory('teknologi')" class="option-card category-btn p-4 rounded-2xl border text-left flex items-start gap-3 transition-all" data-cat="teknologi">
+            <span class="text-2xl">💻</span>
+            <div>
+              <div class="font-bold text-sm">Teknologi &amp; IT</div>
+              <div class="text-xs theme-text-muted">Arsitektur software, AI, cloud &amp; siber.</div>
+            </div>
+          </button>
+          <button onclick="selectCategory('inspirasi')" class="option-card category-btn p-4 rounded-2xl border text-left flex items-start gap-3 transition-all" data-cat="inspirasi">
+            <span class="text-2xl">💡</span>
+            <div>
+              <div class="font-bold text-sm">Mutiara &amp; Inspirasi</div>
+              <div class="text-xs theme-text-muted">Filosofi disiplin &amp; motivasi diri.</div>
+            </div>
+          </button>
+          <button onclick="selectCategory('literatur')" class="option-card category-btn p-4 rounded-2xl border text-left flex items-start gap-3 transition-all" data-cat="literatur">
+            <span class="text-2xl">📖</span>
+            <div>
+              <div class="font-bold text-sm">Cerita &amp; Literatur</div>
+              <div class="text-xs theme-text-muted">Narasi puitis alam, senja &amp; sastra.</div>
+            </div>
+          </button>
+          <button onclick="selectCategory('koding')" class="option-card category-btn p-4 rounded-2xl border text-left flex items-start gap-3 transition-all" data-cat="koding">
+            <span class="text-2xl">🧑‍💻</span>
+            <div>
+              <div class="font-bold text-sm text-cyan-400">Sintaks Koding Dev</div>
+              <div class="text-xs theme-text-muted">Latihan simbol JS, SQL, Git &amp; fungsi kode.</div>
+            </div>
+          </button>
+          <button onclick="selectCategory('custom')" class="option-card category-btn p-4 rounded-2xl border text-left flex items-start gap-3 transition-all" data-cat="custom">
+            <span class="text-2xl">✍️</span>
+            <div>
+              <div class="font-bold text-sm text-purple-400">Teks Kustom Sendiri</div>
+              <div class="text-xs theme-text-muted">Tempelkan artikel atau catatan kuliahmu.</div>
+            </div>
+          </button>
+          <button onclick="selectCategory('adaptive')" class="option-card category-btn p-4 rounded-2xl border text-left flex items-start gap-3 transition-all sm:col-span-2 lg:col-span-3" data-cat="adaptive">
+            <span class="text-2xl">🧠</span>
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="font-bold text-sm text-amber-400">Smart Indonesian Bigram &amp; Weak-Keys AI Engine</span>
+                <span id="adaptive-preview-badge" class="text-[11px] font-mono-custom px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">Menganalisis riwayat ketikanmu...</span>
+              </div>
+              <div class="text-xs theme-text-muted mt-0.5">Meracik kata-kata asli Bahasa Indonesia secara dinamis yang memuat huruf dan transisi 2-huruf (bigram) paling lambat atau sering salah ketik!</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Custom Text Input Box (Shown when 'custom' category is selected) -->
+        <div id="custom-text-box" class="mt-3 hidden">
+          <textarea id="custom-text-input" rows="3" class="w-full p-3.5 rounded-2xl border theme-input-bg text-sm font-mono-custom outline-none focus:border-blue-500" placeholder="Tempelkan atau ketik kalimat kustom yang ingin kamu latih di sini (minimal 5 kata)..."></textarea>
+        </div>
+      </div>
+
+      <!-- TOMBOL MULAI TES SEKARANG -->
+      <button onclick="startTypingTest()" class="w-full py-4 rounded-2xl font-black text-base sm:text-lg shadow-2xl tracking-wide uppercase transition-all transform hover:-translate-y-0.5 theme-btn-primary flex items-center justify-center gap-2">
+        <span>MULAI LATIHAN SEKARANG</span>
+        <span>🚀</span>
+      </button>
+
+    </div>
+
+    <!-- ----------------------------------------------------------------------
+         TYPING TEST AREA (LAYAR PENGETIKAN AKTIF)
+         ---------------------------------------------------------------------- -->
+    <div id="typing-test-area" class="space-y-4 hidden">
+      
+      <!-- RPG BOSS BATTLE ARENA HUD (Only shown in 'boss' mode) -->
+      <div id="boss-hud" class="theme-card border p-4 rounded-2xl shadow-xl hidden relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <!-- Player Shield / HP -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-xs font-bold">
+              <span class="flex items-center gap-1.5 text-emerald-400">🛡️ Perisai Pengetik (Player)</span>
+              <span id="player-hp-text" class="font-mono-custom">100 / 100 HP</span>
+            </div>
+            <div class="w-full h-3 bg-black/40 rounded-full overflow-hidden border" style="border-color: var(--border-main);">
+              <div id="player-hp-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-200" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- Boss HP -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-xs font-bold">
+              <span class="flex items-center gap-1.5 text-rose-400">
+                <span id="boss-avatar-icon" class="text-base">🐉</span>
+                <span id="boss-name-label">Boss</span>
+              </span>
+              <span id="boss-hp-text" class="font-mono-custom text-rose-300">250 / 250 HP</span>
+            </div>
+            <div class="w-full h-3 bg-black/40 rounded-full overflow-hidden border" style="border-color: var(--border-main);">
+              <div id="boss-hp-bar" class="h-full bg-gradient-to-r from-rose-600 to-amber-500 transition-all duration-200" style="width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+        <div id="boss-damage-layer" class="inset-0 pointer-events-none"></div>
+      </div>
+
+      <!-- Live Telemetry Dashboard Bar -->
+      <div class="theme-card border p-4 rounded-2xl flex flex-wrap justify-between items-center gap-4 shadow-xl">
+        <div class="flex flex-wrap items-center gap-5 sm:gap-7 font-mono-custom">
+          <div>
+            <span class="text-[10px] theme-text-muted uppercase font-bold block" id="live-target-title">Target</span>
+            <span id="live-target-display" class="text-lg sm:text-xl font-black text-blue-400">30s</span>
+          </div>
+          <div>
+            <span class="text-[10px] theme-text-muted uppercase font-bold block">Net WPM <span id="live-raw-wpm" class="opacity-60 font-normal">(Raw 0)</span></span>
+            <span id="live-wpm" class="text-lg sm:text-xl font-black text-emerald-400">0</span>
+          </div>
+          <div>
+            <span class="text-[10px] theme-text-muted uppercase font-bold block">Akurasi</span>
+            <span id="live-accuracy" class="text-lg sm:text-xl font-black text-purple-400">100%</span>
+          </div>
+          <div>
+            <span class="text-[10px] theme-text-muted uppercase font-bold block">Streak Combo</span>
+            <span id="live-streak" class="text-lg sm:text-xl font-black text-amber-400">0x</span>
+          </div>
+          <div title="Stabilitas interval antar-ketukan jari (semakin tinggi semakin berirama)">
+            <span class="text-[10px] theme-text-muted uppercase font-bold block">Ritme Aliran</span>
+            <span id="live-rhythm" class="text-lg sm:text-xl font-black text-cyan-400">100%</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span id="timer-standby-badge" class="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[11px] font-bold animate-pulse">
+            ⌨️ Ketik huruf pertama untuk mulai
+          </span>
+          <button onclick="restartCurrentTest()" class="px-3 py-2 rounded-xl text-xs font-bold border theme-control-btn hover:border-blue-400 transition-all flex items-center gap-1" title="Ulangi Tes Cepat (Tombol Tab)">
+            <span>🔄</span> <span class="hidden sm:inline">Ulang</span>
+          </button>
+          <button onclick="cancelTypingTest()" class="px-3 py-2 rounded-xl text-xs font-bold border theme-control-btn hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1">
+            <span>🏠</span> <span class="hidden sm:inline">Menu</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dual Progress & Ghost Pacemaker Bar -->
+      <div class="space-y-1">
+        <div class="w-full bg-black/25 h-2.5 rounded-full overflow-hidden relative border" style="border-color: var(--border-main);">
+          <div id="test-progress-bar" class="h-full theme-btn-primary transition-all duration-200" style="width: 0%;"></div>
+          <div id="ghost-progress-bar" class="h-1 bg-amber-400/90 absolute bottom-0 left-0 transition-all duration-200" style="width: 0%;" title="Posisi Bayangan (Ghost Pacemaker)"></div>
+        </div>
+      </div>
+
+      <!-- Sentence Display Box (Multi-line Window with Smooth Caret & Ghost Caret) -->
+      <div class="theme-card border p-6 sm:p-7 rounded-3xl h-[156px] sm:h-[168px] text-xl sm:text-2xl font-mono-custom leading-relaxed relative overflow-hidden shadow-2xl transition-all select-none" id="sentence-display-container" onclick="focusTypingInput()">
+        
+        <!-- Smooth Sliding Vertical Caret -->
+        <div id="smooth-caret" class="caret-idle"></div>
+
+        <!-- Ghost Pacemaker Caret -->
+        <div id="ghost-caret" class="hidden"></div>
+        
+        <!-- Sentence Words Streamed Dynamically -->
+        <div id="words-wrapper" class="flex flex-wrap content-start gap-x-2.5 gap-y-2.5 w-full transition-transform duration-150"></div>
+      </div>
+
+      <!-- Dedicated Separate Input Field (Pertahankan sesuai preferensi user) -->
+      <div class="relative">
+        <input type="text" id="text-input" autocomplete="off" autocapitalize="off" spellcheck="false" class="w-full theme-card border-2 p-4 pr-32 rounded-2xl text-lg sm:text-xl font-mono-custom outline-none focus:border-blue-500 transition-all shadow-lg" placeholder="Ketik kata yang disorot di sini... (SPASI untuk lanjut, TAB untuk ulang)">
+        <div class="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none text-[11px] font-mono-custom theme-text-muted">
+          <span id="input-word-counter" class="px-2 py-1 rounded-lg border theme-input-bg">Kata 1/1</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ----------------------------------------------------------------------
+         VISUAL GUIDE CONTAINER (BIOMECHANICAL KEYBOARD + HAND SVG + HEATMAP)
+         ---------------------------------------------------------------------- -->
+    <div id="visual-guide-container" class="mt-5 theme-card border p-5 rounded-3xl shadow-2xl space-y-4 hidden transition-all">
+      
+      <!-- Target Key & Biomechanical Overlay Toggles -->
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--border-main);">
+        <div class="flex flex-wrap items-center gap-3 font-bold text-xs sm:text-sm">
+          <span class="flex items-center gap-1.5">
+            <span>🎯</span>
+            <span id="finger-instruction-text" class="text-blue-400">Tombol Target: 'F' (Gunakan Telunjuk Kiri)</span>
+          </span>
+          <span id="bigram-hint-badge" class="text-[11px] font-mono-custom px-2.5 py-0.5 rounded-lg border theme-input-bg theme-text-muted">Bigram: --</span>
+        </div>
+
+        <!-- Interactive Keyboard Layer Toggles -->
+        <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-bold">
+          <button id="toggle-zones-btn" onclick="toggleFingerZones()" class="px-2.5 py-1 rounded-lg border theme-control-btn border-blue-500/50 text-blue-300" title="Tampilkan warna zona 10 jari pada keyboard">
+            🌈 Zona 10 Jari
+          </button>
+          <button id="toggle-heatmap-btn" onclick="toggleKeyboardHeatmap()" class="px-2.5 py-1 rounded-lg border theme-control-btn" title="Tampilkan peta panas akurasi & kecepatan per tombol">
+            🔥 Heatmap Tombol
+          </button>
+          <button id="toggle-hands-btn" onclick="toggleHandDiagram()" class="px-2.5 py-1 rounded-lg border theme-control-btn border-emerald-500/50 text-emerald-300" title="Tampilkan panduan visual 2 tangan">
+            🖐️ Panduan Jari
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Keyboard + Optional Dual-Hand SVG Layout -->
+      <div class="flex flex-col lg:flex-row items-center justify-center gap-4">
+        
+        <!-- Left Hand SVG Indicator -->
+        <div id="left-hand-panel" class="flex flex-col items-center">
+          <svg width="110" height="120" viewBox="0 0 120 130" class="overflow-visible">
+            <!-- Palm -->
+            <rect x="28" y="68" width="66" height="48" rx="20" fill="currentColor" class="opacity-10" />
+            <!-- L5 Kelingking Kiri -->
+            <rect id="svg-finger-L5" x="12" y="36" width="14" height="42" rx="7" fill="#f43f5e" class="hand-finger" />
+            <!-- L4 Manis Kiri -->
+            <rect id="svg-finger-L4" x="31" y="18" width="15" height="54" rx="7.5" fill="#f59e0b" class="hand-finger" />
+            <!-- L3 Tengah Kiri -->
+            <rect id="svg-finger-L3" x="51" y="10" width="15" height="62" rx="7.5" fill="#10b981" class="hand-finger" />
+            <!-- L2 Telunjuk Kiri -->
+            <rect id="svg-finger-L2" x="71" y="20" width="15" height="52" rx="7.5" fill="#3b82f6" class="hand-finger" />
+            <!-- L1 Jempol Kiri -->
+            <rect id="svg-finger-L1" x="92" y="64" width="16" height="36" rx="8" transform="rotate(24 92 64)" fill="#a855f7" class="hand-finger" />
+          </svg>
+          <span class="text-[10px] font-bold uppercase tracking-wider theme-text-muted">Tangan Kiri</span>
+        </div>
+
+        <!-- 2D / 3D Virtual QWERTY Keyboard View (With Full Punctuation) -->
+        <div id="keyboard-view-wrapper" class="keyboard-3d-wrapper overflow-x-auto flex justify-center py-1 flex-1 w-full">
+          <div id="keyboard-board" class="keyboard-3d-board mode-3d show-finger-zones flex flex-col gap-1.5 max-w-2xl w-full">
+            
+            <!-- Row 1: Numbers & Minus/Backspace -->
+            <div class="flex justify-center gap-1 sm:gap-1.5">
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="1" data-finger="L5">1</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="2" data-finger="L4">2</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="3" data-finger="L3">3</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="4" data-finger="L2">4</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="5" data-finger="L2">5</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="6" data-finger="R2">6</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="7" data-finger="R2">7</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="8" data-finger="R3">8</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="9" data-finger="R4">9</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="0" data-finger="R5">0</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="-" data-finger="R5">-</div>
+              <div class="key-btn w-12 h-8 sm:w-14 sm:h-9 rounded-lg flex items-center justify-center text-[10px] font-bold" data-key="backspace" data-finger="R5">⌫</div>
+            </div>
+
+            <!-- Row 2: QWERTY -->
+            <div class="flex justify-center gap-1 sm:gap-1.5">
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="q" data-finger="L5">Q</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="w" data-finger="L4">W</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="e" data-finger="L3">E</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="r" data-finger="L2">R</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="t" data-finger="L2">T</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="y" data-finger="R2">Y</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="u" data-finger="R2">U</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="i" data-finger="R3">I</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="o" data-finger="R4">O</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="p" data-finger="R5">P</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="[" data-finger="R5">[</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="]" data-finger="R5">]</div>
+            </div>
+
+            <!-- Row 3: ASDFGHJKL; -->
+            <div class="flex justify-center gap-1 sm:gap-1.5">
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="a" data-finger="L5">A</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="s" data-finger="L4">S</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="d" data-finger="L3">D</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="f" data-finger="L2">F</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="g" data-finger="L2">G</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="h" data-finger="R2">H</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="j" data-finger="R2">J</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="k" data-finger="R3">K</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="l" data-finger="R4">L</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key=";" data-finger="R5">;</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="'" data-finger="R5">'</div>
+            </div>
+
+            <!-- Row 4: ZXCVBNM,./ -->
+            <div class="flex justify-center gap-1 sm:gap-1.5">
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="z" data-finger="L5">Z</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="x" data-finger="L4">X</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="c" data-finger="L3">C</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="v" data-finger="L2">V</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="b" data-finger="L2">B</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="n" data-finger="R2">N</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="m" data-finger="R2">M</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="," data-finger="R3">,</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="." data-finger="R4">.</div>
+              <div class="key-btn w-7 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="/" data-finger="R5">/</div>
+            </div>
+
+            <!-- Row 5: Spacebar -->
+            <div class="flex justify-center gap-1 sm:gap-1.5">
+              <div class="key-btn w-48 sm:w-64 h-8 sm:h-9 rounded-lg flex items-center justify-center text-xs font-bold" data-key="space" data-finger="R1">SPACEBAR</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right Hand SVG Indicator -->
+        <div id="right-hand-panel" class="flex flex-col items-center">
+          <svg width="110" height="120" viewBox="0 0 120 130" class="overflow-visible">
+            <!-- Palm -->
+            <rect x="26" y="68" width="66" height="48" rx="20" fill="currentColor" class="opacity-10" />
+            <!-- R1 Jempol Kanan -->
+            <rect id="svg-finger-R1" x="12" y="64" width="16" height="36" rx="8" transform="rotate(-24 28 64)" fill="#a855f7" class="hand-finger" />
+            <!-- R2 Telunjuk Kanan -->
+            <rect id="svg-finger-R2" x="34" y="20" width="15" height="52" rx="7.5" fill="#06b6d4" class="hand-finger" />
+            <!-- R3 Tengah Kanan -->
+            <rect id="svg-finger-R3" x="54" y="10" width="15" height="62" rx="7.5" fill="#10b981" class="hand-finger" />
+            <!-- R4 Manis Kanan -->
+            <rect id="svg-finger-R4" x="74" y="18" width="15" height="54" rx="7.5" fill="#f59e0b" class="hand-finger" />
+            <!-- R5 Kelingking Kanan -->
+            <rect id="svg-finger-R5" x="94" y="36" width="14" height="42" rx="7" fill="#f43f5e" class="hand-finger" />
+          </svg>
+          <span class="text-[10px] font-bold uppercase tracking-wider theme-text-muted">Tangan Kanan</span>
+        </div>
+
+      </div>
+
+      <!-- Finger Color Legend -->
+      <div id="finger-zone-legend" class="flex flex-wrap justify-center gap-3 pt-1 text-[10px] font-semibold theme-text-muted">
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Kelingking</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Jari Manis</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Jari Tengah</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span> Telunjuk Kiri</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-cyan-500 inline-block"></span> Telunjuk Kanan</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block"></span> Jempol (Spasi)</span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==========================================================================
+       MODALS & OVERLAYS
+       ========================================================================== -->
+  
+  <!-- 1. RESULT SUMMARY & TELEMETRY CHART MODAL -->
+  <div id="result-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+    <div class="theme-card border p-6 sm:p-7 rounded-3xl max-w-2xl w-full space-y-5 shadow-2xl relative my-auto">
+      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-main);">
+        <div class="flex items-center gap-3">
+          <div id="result-badge-icon" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-lg theme-btn-primary">
+            🏆
+          </div>
+          <div>
+            <h2 id="result-modal-title" class="text-xl font-black tracking-tight">Hasil Latihan Ketik</h2>
+            <p id="result-rank-title" class="text-xs font-bold uppercase tracking-wider text-amber-400">Pembalap Keyboard</p>
+          </div>
+        </div>
+        <button onclick="closeResultModal()" class="theme-text-muted hover:text-white font-bold text-lg px-2">✕</button>
+      </div>
+
+      <!-- Main Score Stats Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 font-mono-custom text-center">
+        <div class="p-3.5 rounded-2xl border theme-input-bg">
+          <div class="text-[10px] theme-text-muted uppercase font-bold">Net WPM</div>
+          <div id="modal-wpm" class="text-2xl sm:text-3xl font-black text-emerald-400">0 WPM</div>
+          <div id="modal-raw-wpm" class="text-[10px] theme-text-muted">Raw: 0 WPM</div>
+        </div>
+        <div class="p-3.5 rounded-2xl border theme-input-bg">
+          <div class="text-[10px] theme-text-muted uppercase font-bold">Akurasi</div>
+          <div id="modal-accuracy" class="text-2xl sm:text-3xl font-black text-purple-400">100%</div>
+          <div id="modal-chars" class="text-[10px] theme-text-muted">0 Karakter</div>
+        </div>
+        <div class="p-3.5 rounded-2xl border theme-input-bg col-span-2 sm:col-span-1">
+          <div class="text-[10px] theme-text-muted uppercase font-bold">Konsistensi Ritme</div>
+          <div id="modal-rhythm" class="text-2xl sm:text-3xl font-black text-cyan-400">100%</div>
+          <div id="modal-time" class="text-[10px] theme-text-muted">Durasi: 0s</div>
+        </div>
+      </div>
+
+      <!-- Post-Test WPM & Error Telemetry Line Chart (SVG) -->
+      <div class="p-4 rounded-2xl border theme-input-bg space-y-2">
+        <div class="flex justify-between items-center text-xs font-bold">
+          <span class="uppercase tracking-wider theme-text-muted">📈 Grafik Telemetri Kecepatan &amp; Kesalahan Per Detik</span>
+          <div class="flex items-center gap-3 text-[10px]">
+            <span class="flex items-center gap-1 text-emerald-400">● Kurva WPM</span>
+            <span class="flex items-center gap-1 text-rose-400">● Titik Typo</span>
+          </div>
+        </div>
+        <div id="telemetry-chart-box" class="w-full h-32 flex items-center justify-center"></div>
+      </div>
+
+      <!-- Weak Keys & Slowest Bigrams Analysis Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="p-3.5 rounded-2xl border theme-input-bg space-y-2">
+          <div class="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1">
+            <span>⚠️</span> Huruf Rawan Typo:
+          </div>
+          <div id="weak-keys-list" class="flex flex-wrap gap-1.5 font-mono-custom text-xs font-bold"></div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl border theme-input-bg space-y-2">
+          <div class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+            <span>🐢</span> Transisi Bigram Terlambat:
+          </div>
+          <div id="slow-bigrams-list" class="flex flex-wrap gap-1.5 font-mono-custom text-xs font-bold"></div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Action Buttons -->
+      <div class="flex flex-wrap justify-between items-center gap-2 pt-3 border-t" style="border-color: var(--border-main);">
+        <div class="flex flex-wrap gap-2">
+          <button onclick="openReplayPlayer()" class="px-3.5 py-2.5 rounded-xl text-white font-bold text-xs bg-purple-600 hover:bg-purple-700 shadow-lg flex items-center gap-1.5">
+            <span>▶️</span> Replay
+          </button>
+          <button onclick="trainWeaknessesNow()" class="px-3.5 py-2.5 rounded-xl text-amber-950 font-bold text-xs bg-amber-400 hover:bg-amber-300 shadow-lg flex items-center gap-1.5">
+            <span>🧠</span> Latih Kelemahan Ini
+          </button>
+          <button onclick="closeResultModal()" class="px-3.5 py-2.5 rounded-xl font-bold text-xs border theme-control-btn flex items-center gap-1.5">
+            <span>🏠</span> Menu Utama
+          </button>
+        </div>
+        <button onclick="closeResultModal(); startTypingTest();" class="px-5 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 shadow-lg">
+          Main Lagi 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. REPLAY PLAYER MODAL -->
+  <div id="replay-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="theme-card border p-6 rounded-3xl max-w-2xl w-full space-y-4 shadow-2xl relative">
+      <div class="flex justify-between items-center border-b pb-3" style="border-color: var(--border-main);">
+        <h3 class="text-xl font-black flex items-center gap-2">
+          <span>🎬</span> Replay Rekaman Ketikan
+        </h3>
+        <button onclick="closeReplayModal()" class="theme-text-muted font-bold text-lg">✕</button>
+      </div>
+
+      <div class="p-4 rounded-2xl border min-h-[140px] flex flex-wrap gap-2 text-xl font-mono-custom relative theme-input-bg" id="replay-display-box"></div>
+
+      <div class="flex items-center justify-between gap-4 p-3 rounded-xl border text-xs font-bold theme-input-bg">
+        <div>Status: <span id="replay-status" class="text-blue-400">Ready</span></div>
+        <div class="flex items-center gap-1.5">Kecepatan: 
+          <button onclick="setReplaySpeed(1)" class="px-2.5 py-1 rounded border theme-control-btn text-xs font-bold">1x</button>
+          <button onclick="setReplaySpeed(2)" class="px-2.5 py-1 rounded border theme-control-btn text-xs font-bold">2x</button>
+          <button onclick="setReplaySpeed(4)" class="px-2.5 py-1 rounded border theme-control-btn text-xs font-bold">4x</button>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button id="replay-play-btn" onclick="toggleReplayPlayback()" class="px-5 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm bg-purple-600 hover:bg-purple-700">
+          ▶️ Play Replay
+        </button>
+        <button onclick="closeReplayModal()" class="px-4 py-2.5 rounded-xl border text-xs font-bold theme-control-btn">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BIOMECHANICAL ANALYTICS & HISTORY MODAL -->
+  <div id="history-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+    <div class="theme-card border p-6 sm:p-8 rounded-3xl max-w-2xl w-full space-y-5 shadow-2xl relative my-auto">
+      <div class="flex justify-between items-center border-b pb-3" style="border-color: var(--border-main);">
+        <h3 class="text-xl font-black flex items-center gap-2">
+          <span>📊</span> Analitik Biometrik Jari &amp; Histori Skor
+        </h3>
+        <button onclick="closeHistoryModal()" class="theme-text-muted font-bold text-lg">✕</button>
+      </div>
+
+      <!-- Summary Analytics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="p-3.5 rounded-2xl border theme-input-bg space-y-1.5">
+          <div class="text-xs font-bold uppercase tracking-wider text-rose-400">🔥 Top 5 Huruf Rawan Salah</div>
+          <div id="analytics-weak-keys" class="flex flex-wrap gap-1.5 font-mono-custom text-xs"></div>
+        </div>
+        <div class="p-3.5 rounded-2xl border theme-input-bg space-y-1.5">
+          <div class="text-xs font-bold uppercase tracking-wider text-amber-400">🐢 Top 5 Bigram Terlambat (ms)</div>
+          <div id="analytics-slow-bigrams" class="flex flex-wrap gap-1.5 font-mono-custom text-xs"></div>
+        </div>
+      </div>
+
+      <div class="text-xs font-bold uppercase tracking-wider theme-text-muted">Riwayat 30 Sesi Terakhir</div>
+      <div class="max-h-56 overflow-y-auto no-scrollbar space-y-2" id="history-list-container"></div>
+
+      <div class="flex flex-wrap justify-between items-center gap-2 pt-3 border-t" style="border-color: var(--border-main);">
+        <div class="flex gap-2">
+          <button onclick="exportData()" class="px-3 py-2 rounded-xl border text-xs font-bold theme-control-btn hover:border-emerald-500">
+            💾 Export JSON
+          </button>
+          <label class="px-3 py-2 rounded-xl border text-xs font-bold cursor-pointer theme-control-btn hover:border-blue-500">
+            📥 Import JSON
+            <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+          </label>
+        </div>
+        <button onclick="clearHistoryData()" class="px-3 py-2 rounded-xl text-xs font-bold text-red-400 hover:bg-red-500/10">
+          Hapus Semua Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Floating Toast Notification -->
+  <div id="toast-notification" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl theme-btn-primary shadow-2xl text-xs font-bold flex items-center gap-2 opacity-0 pointer-events-none transform translate-y-4">
+    <span id="toast-icon">✨</span>
+    <span id="toast-message">Notifikasi</span>
+  </div>
+
+  <!-- Footer Info -->
+  <footer class="max-w-5xl w-full mx-auto text-center text-xs theme-text-muted py-4">
+    KetikFast Ultimate 2.0 &copy; 2026 &bull; Biomechanical Touch Typing Lab, Smart Bigram AI &amp; RPG Arena
+  </footer>
+
+  <!-- Modular Data & Application Logic -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

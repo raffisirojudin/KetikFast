@@ -1,0 +1,494 @@
+/* ==========================================================================
+   style.css - KetikFast Ultimate v2.0 Stylesheet
+   ========================================================================== */
+
+:root[data-theme="dark-slate"] {
+  --bg-main: #0b1120;
+  --bg-card: #162032;
+  --bg-input: #090e1a;
+  --border-main: #293852;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-text: #ffffff;
+  --accent-glow: rgba(59, 130, 246, 0.45);
+  --char-pending: #566782;
+  --char-correct: #10b981;
+  --char-wrong: #f43f5e;
+  --key-bg: #1e2d45;
+  --key-border: #334868;
+  --key-shadow: rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="retro-paper"] {
+  --bg-main: #f4ebd0;
+  --bg-card: #e9dec6;
+  --bg-input: #efe4c6;
+  --border-main: #cbb892;
+  --text-main: #2b1d0c;
+  --text-muted: #6e5644;
+  --accent: #8b4513;
+  --accent-hover: #6a340d;
+  --accent-text: #ffffff;
+  --accent-glow: rgba(139, 69, 19, 0.35);
+  --char-pending: #8c7764;
+  --char-correct: #1b6320;
+  --char-wrong: #c62828;
+  --key-bg: #dbcea6;
+  --key-border: #b8a67d;
+  --key-shadow: rgba(43, 29, 12, 0.25);
+}
+
+:root[data-theme="dracula"] {
+  --bg-main: #21222c;
+  --bg-card: #282a36;
+  --bg-input: #191a21;
+  --border-main: #44475a;
+  --text-main: #f8f8f2;
+  --text-muted: #94a3b8;
+  --accent: #ff79c6;
+  --accent-hover: #ff92d0;
+  --accent-text: #21222c;
+  --accent-glow: rgba(255, 121, 198, 0.45);
+  --char-pending: #6272a4;
+  --char-correct: #50fa7b;
+  --char-wrong: #ff5555;
+  --key-bg: #383b4c;
+  --key-border: #6272a4;
+  --key-shadow: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="matrix"] {
+  --bg-main: #040704;
+  --bg-card: #0a120b;
+  --bg-input: #030503;
+  --border-main: #153819;
+  --text-main: #00ff66;
+  --text-muted: #00aa3c;
+  --accent: #00ff66;
+  --accent-hover: #33ff85;
+  --accent-text: #040704;
+  --accent-glow: rgba(0, 255, 102, 0.5);
+  --char-pending: #0a5c22;
+  --char-correct: #00ff66;
+  --char-wrong: #ff3333;
+  --key-bg: #0f2111;
+  --key-border: #1b471e;
+  --key-shadow: rgba(0, 255, 102, 0.15);
+}
+
+:root[data-theme="mocha"] {
+  --bg-main: #1b1513;
+  --bg-card: #281f1c;
+  --bg-input: #140f0d;
+  --border-main: #423430;
+  --text-main: #ede0d4;
+  --text-muted: #9e877c;
+  --accent: #e0a96d;
+  --accent-hover: #cca05b;
+  --accent-text: #1b1513;
+  --accent-glow: rgba(224, 169, 109, 0.35);
+  --char-pending: #7f6a62;
+  --char-correct: #94d2bd;
+  --char-wrong: #e76f51;
+  --key-bg: #382c28;
+  --key-border: #52403a;
+  --key-shadow: rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme="cyberpunk"] {
+  --bg-main: #090c15;
+  --bg-card: #121829;
+  --bg-input: #06080f;
+  --border-main: #1e2c4c;
+  --text-main: #f3f4f6;
+  --text-muted: #94a3b8;
+  --accent: #ec4899;
+  --accent-hover: #db2777;
+  --accent-text: #ffffff;
+  --accent-glow: rgba(236, 72, 153, 0.5);
+  --char-pending: #475569;
+  --char-correct: #06b6d4;
+  --char-wrong: #f43f5e;
+  --key-bg: #1a243b;
+  --key-border: #3b82f6;
+  --key-shadow: rgba(6, 182, 212, 0.25);
+}
+
+/* Base Body & Theme Helpers */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
+}
+
+.theme-card {
+  background-color: var(--bg-card);
+  border-color: var(--border-main);
+}
+
+.theme-input-bg {
+  background-color: var(--bg-input);
+  border-color: var(--border-main);
+}
+
+.theme-text-muted {
+  color: var(--text-muted);
+}
+
+.theme-control-btn {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-main);
+  color: var(--text-main);
+  transition: all 0.18s ease;
+}
+
+.theme-control-btn:hover {
+  border-color: var(--accent);
+}
+
+/* Uniform Header Toolbar Pill - Ensures 100% Straight Horizontal Alignment */
+.toolbar-pill {
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  box-sizing: border-box;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.toolbar-pill select {
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 2px;
+  margin: 0;
+}
+
+.toolbar-pill input[type="range"] {
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.theme-btn-primary {
+  background-color: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.theme-btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.option-card {
+  background-color: var(--bg-input);
+  border-color: var(--border-main);
+}
+
+.option-card:hover {
+  border-color: var(--accent);
+}
+
+.option-card.active {
+  border-color: var(--accent) !important;
+  background-color: var(--bg-card) !important;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.font-mono-custom {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+select option {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+}
+
+/* Word & Character Layout */
+.word-unit {
+  display: inline-flex;
+  white-space: nowrap;
+  padding: 2px 4px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, opacity 0.2s ease;
+}
+
+.word-unit.current-word {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.char-unit {
+  color: var(--char-pending);
+  transition: color 0.06s ease;
+  position: relative;
+}
+
+.char-unit.extra-char {
+  color: var(--char-wrong);
+  opacity: 0.85;
+  text-decoration: underline wavy var(--char-wrong);
+}
+
+/* Smooth Caret & Ghost Pacemaker Caret */
+#smooth-caret {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.5px;
+  height: 1.5em;
+  background-color: var(--accent);
+  border-radius: 2px;
+  box-shadow: 0 0 12px var(--accent-glow);
+  transition: transform 0.065s cubic-bezier(0.15, 0.9, 0.25, 1), height 0.08s ease;
+  pointer-events: none;
+  z-index: 20;
+}
+
+#ghost-caret {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.5px;
+  height: 1.5em;
+  background-color: #f59e0b;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+  transition: transform 0.18s linear;
+  pointer-events: none;
+  z-index: 15;
+  opacity: 0.75;
+}
+
+#ghost-caret::after {
+  content: '👻';
+  position: absolute;
+  top: -16px;
+  left: -6px;
+  font-size: 10px;
+  line-height: 1;
+}
+
+@keyframes caretBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.caret-idle {
+  animation: caretBlink 1s infinite ease-in-out;
+}
+
+/* 3D & 2D Mechanical Keyboard */
+.keyboard-3d-wrapper {
+  perspective: 950px;
+  perspective-origin: 50% -15%;
+  padding: 8px 0 14px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.keyboard-3d-board {
+  transform-style: preserve-3d;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.keyboard-3d-board.mode-3d {
+  transform: rotateX(22deg);
+}
+
+.keyboard-3d-board.mode-2d {
+  transform: rotateX(0deg);
+}
+
+.key-btn {
+  background-color: var(--key-bg);
+  border: 1px solid var(--key-border);
+  color: var(--text-main);
+  transition: transform 0.07s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  user-select: none;
+  position: relative;
+}
+
+/* Home Row Tactile Bump (F & J) */
+.key-btn[data-key="f"]::after,
+.key-btn[data-key="j"]::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 10px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: currentColor;
+  opacity: 0.6;
+}
+
+@keyframes keyGlowPulse {
+  0%, 100% {
+    box-shadow: 0 4px 0 var(--accent-hover), 0 0 18px var(--accent-glow), 0 0 32px var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 4px 0 var(--accent-hover), 0 0 28px var(--accent-glow), 0 0 48px var(--accent-glow);
+  }
+}
+
+.mode-3d .key-btn {
+  box-shadow: 0 4px 0 var(--key-border), 0 7px 12px var(--key-shadow);
+  transform: translateZ(0);
+  margin-bottom: 4px;
+}
+
+.mode-3d .key-btn.next-key {
+  background-color: var(--accent) !important;
+  color: var(--accent-text) !important;
+  border-color: #ffffff !important;
+  animation: keyGlowPulse 1.2s infinite ease-in-out;
+  transform: translateY(-3px) translateZ(8px) !important;
+  z-index: 10;
+}
+
+.mode-3d .key-btn.pressed-key {
+  background-color: var(--char-correct) !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  transform: translateY(3px) translateZ(-3px) !important;
+  box-shadow: 0 1px 0 var(--key-border), 0 0 18px var(--char-correct) !important;
+}
+
+.mode-3d .key-btn.pressed-wrong {
+  background-color: var(--char-wrong) !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  transform: translateY(3px) translateZ(-3px) !important;
+  box-shadow: 0 1px 0 var(--key-border), 0 0 20px var(--char-wrong) !important;
+}
+
+.mode-2d .key-btn {
+  box-shadow: 0 2px 0 var(--key-border);
+}
+
+.mode-2d .key-btn.next-key {
+  background-color: var(--accent) !important;
+  color: var(--accent-text) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 20px var(--accent-glow) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+  z-index: 10;
+}
+
+.mode-2d .key-btn.pressed-key {
+  background-color: var(--char-correct) !important;
+  color: #ffffff !important;
+  transform: translateY(2px);
+}
+
+.mode-2d .key-btn.pressed-wrong {
+  background-color: var(--char-wrong) !important;
+  color: #ffffff !important;
+  transform: translateY(2px);
+}
+
+/* Biomechanical 10-Finger Color Zones */
+.show-finger-zones .key-btn[data-finger="L5"],
+.show-finger-zones .key-btn[data-finger="R5"] {
+  border-bottom: 3px solid #f43f5e;
+  background-color: rgba(244, 63, 94, 0.14);
+}
+.show-finger-zones .key-btn[data-finger="L4"],
+.show-finger-zones .key-btn[data-finger="R4"] {
+  border-bottom: 3px solid #f59e0b;
+  background-color: rgba(245, 158, 11, 0.14);
+}
+.show-finger-zones .key-btn[data-finger="L3"],
+.show-finger-zones .key-btn[data-finger="R3"] {
+  border-bottom: 3px solid #10b981;
+  background-color: rgba(16, 185, 129, 0.14);
+}
+.show-finger-zones .key-btn[data-finger="L2"] {
+  border-bottom: 3px solid #3b82f6;
+  background-color: rgba(59, 130, 246, 0.16);
+}
+.show-finger-zones .key-btn[data-finger="R2"] {
+  border-bottom: 3px solid #06b6d4;
+  background-color: rgba(6, 182, 212, 0.16);
+}
+.show-finger-zones .key-btn[data-finger="R1"],
+.show-finger-zones .key-btn[data-finger="L1"] {
+  border-bottom: 3px solid #a855f7;
+  background-color: rgba(168, 85, 247, 0.14);
+}
+
+/* Live Heatmap Key Overlay Colors */
+.show-heatmap .key-btn[data-heat="hot"] {
+  background-color: rgba(244, 63, 94, 0.45) !important;
+  border-color: #f43f5e !important;
+  color: #ffffff !important;
+}
+.show-heatmap .key-btn[data-heat="warm"] {
+  background-color: rgba(245, 158, 11, 0.38) !important;
+  border-color: #f59e0b !important;
+}
+.show-heatmap .key-btn[data-heat="good"] {
+  background-color: rgba(16, 185, 129, 0.28) !important;
+  border-color: #10b981 !important;
+}
+
+/* Boss Battle Damage Popups & Shake */
+@keyframes floatUpFade {
+  0% { opacity: 1; transform: translateY(0) scale(0.9); }
+  50% { opacity: 1; transform: translateY(-18px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-34px) scale(0.95); }
+}
+
+.dmg-popup {
+  position: absolute;
+  pointer-events: none;
+  font-weight: 900;
+  animation: floatUpFade 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 40;
+}
+
+@keyframes bossHitShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px) rotate(-4deg); }
+  75% { transform: translateX(6px) rotate(4deg); }
+}
+
+.boss-shake {
+  animation: bossHitShake 0.22s ease-in-out;
+}
+
+/* SVG Hand Guide Active Finger Pulse */
+.hand-finger {
+  transition: fill 0.15s ease, transform 0.15s ease, filter 0.15s ease;
+  opacity: 0.35;
+}
+
+.hand-finger.active-finger {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px var(--accent));
+}
+
+/* Hide Scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+#toast-notification {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
